@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>♟️ AOKIRA GAME CHESS — Training Mode 2026</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Chess Rules Library (Chess.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+</head>
+<body>
+
+  <!-- BG FX -->
+  <div class="cyber-bg">
+    <div class="cyber-grid"></div>
+    <div class="glow-orb orb-red"></div>
+    <div class="glow-orb orb-blue"></div>
+  </div>
+
+  <!-- 1. LANDING SCREEN -->
+  <section id="landing-screen" class="active">
+    <div class="landing-content glass-card">
+      <div class="cyber-badge">OFFICIAL 2026 TRAINING MODE</div>
+      <h1 class="glitch-text" data-text="AOKIRA">AOKIRA <span>CHESS</span></h1>
+      <p class="tagline">TRAIN HARDER. THINK DEEPER. PLAY BETTER.</p>
+      <p class="sub-tagline">Face the engine. Learn from every move.</p>
+      
+      <button id="btn-start-landing" class="cyber-btn btn-glow">
+        <span>LANJUT [ ➔ ]</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. SIDE SELECTION SCREEN -->
+  <section id="side-screen" class="hidden">
+    <div class="side-content glass-card">
+      <h2>CHOOSE YOUR SIDE</h2>
+      <p>System Control: Stockfish Full Strength (10+5 Time Control)</p>
+
+      <div class="side-picker">
+        <button id="pick-white" class="side-btn white-side">
+          <span class="symbol">♔</span>
+          <span class="label">WHITE</span>
+          <span class="desc">Move First</span>
+        </button>
+        <button id="pick-black" class="side-btn black-side">
+          <span class="symbol">♚</span>
+          <span class="label">BLACK</span>
+          <span class="desc">Move Second</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. MAIN CHESS INTERFACE -->
+  <section id="main-interface" class="hidden">
+    <!-- Top Header Bar -->
+    <header class="cyber-header glass-card">
+      <div class="brand">
+        <span class="icon">♟</span>
+        <span class="name">AOKIRA <span>GAME CHESS</span></span>
+      </div>
+      <div class="status-badge">
+        <span class="pulse-dot"></span> STOCKFISH ONLINE (10+5)
+      </div>
+      <div class="controls-top">
+        <button id="btn-sound" class="icon-btn" title="Toggle Sound">🔊</button>
+      </div>
+    </header>
+
+    <div class="game-container">
+      
+      <!-- Engine Status & Thinking Bar -->
+      <div class="sidebar-panel left-panel glass-card">
+        <div class="panel-header red-header">ENGINE HARDWARE STATUS</div>
+        <div class="engine-meta" id="engine-status-box">
+          <div><span class="lbl">ENGINE:</span> <span class="val" id="st-version">Stockfish WASM</span></div>
+          <div><span class="lbl">MODE:</span> <span class="val highlight-blue">MAX PRACTICAL</span></div>
+          <div><span class="lbl">WORKER:</span> <span class="val green" id="st-worker">ACTIVE</span></div>
+          <div><span class="lbl">WASM:</span> <span class="val green" id="st-wasm">ENABLED</span></div>
+          <div><span class="lbl">THREADS:</span> <span class="val" id="st-threads">Auto-Detect</span></div>
+        </div>
+
+        <div class="panel-header blue-header">STOCKFISH THINKING MONITOR</div>
+        <div class="thinking-box" id="thinking-box">
+          <div class="thinking-idle">Stockfish is ready. Waiting for input...</div>
+          <div class="thinking-live hidden" id="live-thinking">
+            <div class="think-stat"><span>DEPTH:</span> <strong id="inf-depth">0</strong></div>
+            <div class="think-stat"><span>EVAL:</span> <strong id="inf-eval" class="eval-val">0.00</strong></div>
+            <div class="think-stat"><span>NODES:</span> <span id="inf-nodes">0</span></div>
+            <div class="think-stat"><span>NPS:</span> <span id="inf-nps">0</span></div>
+            <div class="think-stat pv-line"><span>PV:</span> <span id="inf-pv" class="pv-text">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Board Center -->
+      <div class="board-stage">
+        
+        <!-- Opponent Header (Stockfish) -->
+        <div class="player-bar glass-card opponent-bar">
+          <div class="player-info">
+            <span class="avatar">🤖</span>
+            <div>
+              <div class="p-name">STOCKFISH ENGINE</div>
+              <div class="p-role">Full Strength AI</div>
+            </div>
+          </div>
+          <div class="clock red-clock" id="clock-top">10:00</div>
+        </div>
+
+        <!-- Chess Board Grid -->
+        <div class="board-wrapper">
+          <div id="chess-board" class="chess-board"></div>
+          
+          <!-- Thinking Overlay Block Input -->
+          <div id="board-lock-overlay" class="board-lock hidden">
+            <div class="spinner"></div>
+            <span>STOCKFISH THINKING...</span>
+          </div>
+        </div>
+
+        <!-- Player Header (Human) -->
+        <div class="player-bar glass-card player-bar-bottom">
+          <div class="player-info">
+            <span class="avatar">👤</span>
+            <div>
+              <div class="p-name">HUMAN PLAYER</div>
+              <div class="p-role">You</div>
+            </div>
+          </div>
+          <div class="clock blue-clock" id="clock-bottom">10:00</div>
+        </div>
+
+        <!-- Game Controls Button Bar -->
+        <div class="action-bar glass-card">
+          <button id="btn-undo" class="action-btn">↩ UNDO</button>
+          <button id="btn-resign" class="action-btn danger">🏳 RESIGN</button>
+          <button id="btn-draw" class="action-btn">🤝 OFFER DRAW</button>
+          <button id="btn-restart" class="action-btn">🔄 RESTART</button>
+        </div>
+
+      </div>
+
+      <!-- Move History & Notation Right Panel -->
+      <div class="sidebar-panel right-panel glass-card">
+        <div class="panel-header">MOVE HISTORY</div>
+        <div class="notation-box" id="notation-box">
+          <table id="notation-table">
+            <thead>
+              <tr><th>#</th><th>WHITE</th><th>BLACK</th></tr>
+            </thead>
+            <tbody id="notation-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. POST-GAME TRAINING ANALYSIS MODAL -->
+  <div id="analysis-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h2>🧠 TRAINING ANALYSIS REPORT</h2>
+        <button id="close-modal" class="close-btn">✖</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="game-result-banner" id="result-banner">CHECKMATE - STOCKFISH WINS</div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="num green" id="stat-inaccuracies">0</span>
+            <span class="lbl">Inaccuracies</span>
+          </div>
+          <div class="stat-card">
+            <span class="num yellow" id="stat-mistakes">0</span>
+            <span class="lbl">Mistakes</span>
+          </div>
+          <div class="stat-card">
+            <span class="num red" id="stat-blunders">0</span>
+            <span class="lbl">Blunders</span>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>⚡ CRITICAL MOMENTS DETECTED</h3>
+          <div class="critical-list" id="critical-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-analyze-replay" class="cyber-btn">REPLAY GAME</button>
+        <button id="btn-play-again" class="cyber-btn btn-glow">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
